@@ -1,5 +1,4 @@
-package CS5920;
-
+package src.main.java.encryptors;
 
 import java.io.*;
 import java.util.Arrays;
@@ -16,7 +15,7 @@ import java.util.Arrays;
  *
  * The result written to the output file.
  */
-class AES {
+public class AES implements EncryptionAlgorithm {
 
     private static final boolean DEBUG = true;
 
@@ -46,6 +45,15 @@ class AES {
         MIX_COLUMNS[1] = new int[]{1,2,3,1};
         MIX_COLUMNS[2] = new int[]{1,1,2,3};
         MIX_COLUMNS[3] = new int[]{3,1,1,2};
+    }
+
+    private static final AES instance = new AES();
+
+    private AES() {
+    }
+
+    public static AES getInstance() {
+        return instance;
     }
 
     public static void main(String[] args) throws IOException {
@@ -291,11 +299,11 @@ class AES {
         int sum = 0;
 
         for(int i = 0; i < left.length; i++) {
-            final CS5920.GFCalculator.BitField leftByte = new CS5920.GFCalculator.BitField(Integer.toBinaryString(left[i]));
-            final CS5920.GFCalculator.BitField rightByte = new CS5920.GFCalculator.BitField(Integer.toBinaryString(right[i]));
+            final GFCalculator.BitField leftByte = new GFCalculator.BitField(Integer.toBinaryString(left[i]));
+            final GFCalculator.BitField rightByte = new GFCalculator.BitField(Integer.toBinaryString(right[i]));
 
             //noinspection SuspiciousNameCombination
-            sum = Integer.valueOf(CS5920.GFCalculator.addition(new CS5920.GFCalculator.BitField(Integer.toBinaryString(sum)), CS5920.GFCalculator.multiplication(leftByte, rightByte)).toString(), 2);
+            sum = Integer.valueOf(GFCalculator.addition(new GFCalculator.BitField(Integer.toBinaryString(sum)), GFCalculator.multiplication(leftByte, rightByte)).toString(), 2);
         }
 
         return sum;
@@ -416,6 +424,16 @@ class AES {
         final int leftBytes = (byte1 - rightBytes) / 16;
 
         return SBOX[leftBytes][rightBytes];
+    }
+
+    @Override
+    public byte[] encrypt(byte[] plainText) {
+        return new byte[0]; //todo
+    }
+
+    @Override
+    public byte[] decrypt(byte[] cypherText) {
+        return new byte[0]; //todo
     }
 
     //chunk of 4 bytes
