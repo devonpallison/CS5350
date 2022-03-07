@@ -2,7 +2,11 @@ package src.main.java.encryptors;
 
 import src.main.java.Encryptor;
 
+/**
+ * Implementation of a complex tent map image encryption
+ */
 public class CTM implements EncryptionAlgorithm {
+    public static final float r = 3;//r is the control parameter in the range [0,4
 
     private static final CTM instance = new CTM();
 
@@ -36,9 +40,9 @@ public class CTM implements EncryptionAlgorithm {
     private static int key(byte b) {
         int ret;
         if (b < 0.5) {
-            ret = (int) (4 - 3 / 4 * Encryptor.r * b * (1 - b ^ 2) + Encryptor.r / 2 * b % 1);
+            ret = (int) (4 - 3 / 4 * r * b * (1 - b ^ 2) + r / 2 * b % 1);
         } else {
-            ret = (int) (4 - 3 / 4 * Encryptor.r * b * (1 - b ^ 2) + Encryptor.r / 2 * (1 - b) % 1);
+            ret = (int) (4 - 3 / 4 * r * b * (1 - b ^ 2) + r / 2 * (1 - b) % 1);
         }
         return ret;
     }

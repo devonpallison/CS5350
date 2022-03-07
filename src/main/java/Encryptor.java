@@ -6,7 +6,6 @@ import src.main.java.util.FileUtil;
 import java.io.*;
 
 public class Encryptor {
-    public static final float r = 3;//r is the control parameter in the range [0,4]
     public static final String INPUT_IMAGE_FILE_PREFIX = "testImages/";
     public static final String OUTPUT_IMAGE_FILE_PREFIX = "outputImages/";
 

@@ -3,6 +3,7 @@ package src.main.java.encryptors;
 import src.main.java.Encryptor;
 
 public class ASLBTM implements EncryptionAlgorithm {
+    public static final float r = 3;//r is the control parameter in the range [0,4]
 
     private static final ASLBTM instance = new ASLBTM();
 
@@ -36,9 +37,9 @@ public class ASLBTM implements EncryptionAlgorithm {
     private static int key(byte b) {
         int ret;
         if (b < 0.5) {
-            ret = (int) (4 - Encryptor.r / 4 * Math.sin(3.14159 * b) + Encryptor.r / 2 * b);
+            ret = (int) (4 - r / 4 * Math.sin(3.14159 * b) + r / 2 * b);
         } else {
-            ret = (int) ((4 - Encryptor.r) * b * (1 - b) + Encryptor.r / 2 * (1 - b));
+            ret = (int) ((4 - r) * b * (1 - b) + r / 2 * (1 - b));
         }
         return ret;
     }
