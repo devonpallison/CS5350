@@ -27,7 +27,6 @@ public class LogisticMap implements EncryptionAlgorithm {
         }
 
         final byte[] cypherText = new byte[plainText.length];
-        int j = 0;
         double y0 = logisticMap(initialConditionY());
         for(int i = 0; i < plainText.length; i+=3) {
             byte byteRed = plainText[i];
@@ -37,36 +36,103 @@ public class LogisticMap implements EncryptionAlgorithm {
             double y = logisticMap(y0);
             y0 = y;
             if(inRange(y, 0.1, 0.13) || inRange(y, 0.34, 0.37) || inRange(y, 0.58, 0.62)) {
-                cypherText[i] = BitOperations.invert(byteRed);
-                cypherText[i] = BitOperations.invert(byteGreen);
-                cypherText[i] = BitOperations.invert(byteBlue);
+                byteRed = (byte) ~byteRed;
+                byteGreen = (byte) ~byteGreen;
+                byteBlue = (byte) ~byteBlue;
             } else if(inRange(y, 0.13, 0.16) || inRange(y, 0.37, 0.40) || inRange(y, 0.62, 0.66)) {
-                //todo
+                byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key4));
+                byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key5));
+                byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key6));
             } else if(inRange(y, 0.16, 0.19) || inRange(y, 0.40, 0.43) || inRange(y, 0.66, 0.70)) {
-                //todo
+                byteRed = (byte) (((int) byteRed) + ((int) BitOperations.convertToByte(key4)) + ((int) BitOperations.convertToByte(key5)));
+                byteGreen = (byte) (((int) byteGreen) + ((int) BitOperations.convertToByte(key5)) + ((int) BitOperations.convertToByte(key6)));
+                byteBlue = (byte) (((int) byteBlue) + ((int) BitOperations.convertToByte(key6)) + ((int) BitOperations.convertToByte(key4)));
             } else if(inRange(y, 0.19, 0.22) || inRange(y, 0.43, 0.46) || inRange(y, 0.70, 0.74)) {
-                //todo
+                byteRed = (byte) (~(byteRed ^ BitOperations.convertToByte(key4)));
+                byteGreen = (byte) (~(byteGreen ^ BitOperations.convertToByte(key5)));
+                byteBlue = (byte) (~(byteBlue ^ BitOperations.convertToByte(key6)));
             } else if(inRange(y, 0.22, 0.25) || inRange(y, 0.46, 0.49) || inRange(y, 0.74, 0.78)) {
-                //todo
+                byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key7));
+                byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key8));
+                byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key9));
             } else if(inRange(y, 0.25, 0.28) || inRange(y, 0.49, 0.52) || inRange(y, 0.78, 0.82)) {
-                //todo
+                byteRed = (byte) (((int) byteRed) + ((int) BitOperations.convertToByte(key7)) + ((int) BitOperations.convertToByte(key8)));
+                byteGreen = (byte) (((int) byteGreen) + ((int) BitOperations.convertToByte(key8)) + ((int) BitOperations.convertToByte(key9)));
+                byteBlue = (byte) (((int) byteBlue) + ((int) BitOperations.convertToByte(key9)) + ((int) BitOperations.convertToByte(key7)));
             } else if(inRange(y, 0.28, 0.31) || inRange(y, 0.52, 0.55) || inRange(y, 0.82, 0.86)) {
-                //todo
+                byteRed = (byte) (~(byteRed ^ BitOperations.convertToByte(key7)));
+                byteGreen = (byte) (~(byteGreen ^ BitOperations.convertToByte(key8)));
+                byteBlue = (byte) (~(byteBlue ^ BitOperations.convertToByte(key9)));
             } else {
-
+                //do nothing
             }
+
+            cypherText[i] = byteRed;
+            cypherText[i+1] = byteGreen;
+            cypherText[i+2] = byteBlue;
         }
 
-        return new byte[0];
-    }
-
-    private static boolean inRange(double y, double inclusiveStart, double exclusiveEnd) {
-        return y >= inclusiveStart && y < exclusiveEnd;
+        return cypherText;
     }
 
     @Override
     public byte[] decrypt(byte[] cypherText) {
-        return new byte[0];
+        if(cypherText.length % 3 != 0) {
+            throw new RuntimeException("Expect R,G,B pattern for byte array here");
+        }
+
+        final byte[] plainText = new byte[cypherText.length];
+        double y0 = logisticMap(initialConditionY());
+        for(int i = 0; i < cypherText.length; i+=3) {
+            byte byteRed = cypherText[i];
+            byte byteGreen = cypherText[i + 1];
+            byte byteBlue = cypherText[i + 2];
+
+            double y = logisticMap(y0);
+            y0 = y;
+            if(inRange(y, 0.1, 0.13) || inRange(y, 0.34, 0.37) || inRange(y, 0.58, 0.62)) {
+                byteRed = (byte) ~byteRed;
+                byteGreen = (byte) ~byteGreen;
+                byteBlue = (byte) ~byteBlue;
+            } else if(inRange(y, 0.13, 0.16) || inRange(y, 0.37, 0.40) || inRange(y, 0.62, 0.66)) {
+                byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key4));
+                byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key5));
+                byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key6));
+            } else if(inRange(y, 0.16, 0.19) || inRange(y, 0.40, 0.43) || inRange(y, 0.66, 0.70)) {
+                byteRed = (byte) (((int) byteRed) + 256 - ((int) BitOperations.convertToByte(key4)) - ((int) BitOperations.convertToByte(key5)));
+                byteGreen = (byte) (((int) byteGreen) + 256 - ((int) BitOperations.convertToByte(key5)) - ((int) BitOperations.convertToByte(key6)));
+                byteBlue = (byte) (((int) byteBlue) + 256 - ((int) BitOperations.convertToByte(key6)) - ((int) BitOperations.convertToByte(key4)));
+            } else if(inRange(y, 0.19, 0.22) || inRange(y, 0.43, 0.46) || inRange(y, 0.70, 0.74)) {
+                byteRed = (byte) ((~byteRed) ^ BitOperations.convertToByte(key4));
+                byteGreen = (byte) ((~byteGreen) ^ BitOperations.convertToByte(key5));
+                byteBlue = (byte) ((~byteBlue) ^ BitOperations.convertToByte(key6));
+            } else if(inRange(y, 0.22, 0.25) || inRange(y, 0.46, 0.49) || inRange(y, 0.74, 0.78)) {
+                byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key7));
+                byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key8));
+                byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key9));
+            } else if(inRange(y, 0.25, 0.28) || inRange(y, 0.49, 0.52) || inRange(y, 0.78, 0.82)) {
+                byteRed = (byte) (((int) byteRed) + 256 - ((int) BitOperations.convertToByte(key7)) - ((int) BitOperations.convertToByte(key8)));
+                byteGreen = (byte) (((int) byteGreen) + 256 - ((int) BitOperations.convertToByte(key8)) - ((int) BitOperations.convertToByte(key9)));
+                byteBlue = (byte) (((int) byteBlue) + 256 - ((int) BitOperations.convertToByte(key9)) - ((int) BitOperations.convertToByte(key7)));
+            } else if(inRange(y, 0.28, 0.31) || inRange(y, 0.52, 0.55) || inRange(y, 0.82, 0.86)) {
+                byteRed = (byte) ((~byteRed) ^ BitOperations.convertToByte(key7));
+                byteGreen = (byte) ((~byteGreen) ^ BitOperations.convertToByte(key8));
+                byteBlue = (byte) ((~byteBlue) ^ BitOperations.convertToByte(key9));
+            } else {
+                //do nothing
+            }
+
+            plainText[i] = byteRed;
+            plainText[i+1] = byteGreen;
+            plainText[i+2] = byteBlue;
+        }
+
+        return plainText;
+    }
+
+
+    private static boolean inRange(double y, double inclusiveStart, double exclusiveEnd) {
+        return y >= inclusiveStart && y < exclusiveEnd;
     }
 
     private static double logisticMap(final double x) {

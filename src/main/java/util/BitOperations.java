@@ -48,12 +48,17 @@ public class BitOperations {
         }
 
         int base32 = toBase10(bitString);
-        System.out.println(base32);
         return (byte) base32;
     }
 
     public static void main(String[] args) {
         byte b = 10;
-        System.out.println(convertToByte(new int[]{1,0,0,0,0,0,1,0}));
+        byte b2 = (byte) ~b;
+        byte b3 = (byte) ~b2;
+        byte b4 = (byte) ~b3;
+        System.out.println(b);
+        System.out.println(b2);
+        System.out.println(b3);
+        System.out.println(b4);
     }
 }
