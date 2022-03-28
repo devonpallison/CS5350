@@ -1,5 +1,7 @@
 package src.main.java;
 
+import src.main.java.encryptors.AlteredSineLogisticBasedTentMap;
+import src.main.java.encryptors.CubicTentMap;
 import src.main.java.encryptors.EncryptionAlgorithm;
 import src.main.java.util.FileUtil;
 
@@ -10,18 +12,18 @@ public class Encryptor {
     public static final String OUTPUT_IMAGE_FILE_PREFIX = "outputImages/";
 
     public enum Algorithm {
-        AES,
         ASLBTM,
+        LM,
         CTM;
 
         public EncryptionAlgorithm getEncryptionAlgorithm() {
             switch (this) {
-                case AES:
-                    return src.main.java.encryptors.AES.getInstance();
                 case ASLBTM:
-                    return src.main.java.encryptors.ASLBTM.getInstance();
+                    return AlteredSineLogisticBasedTentMap.getInstance();
                 case CTM:
-                    return src.main.java.encryptors.CTM.getInstance();
+                    return CubicTentMap.getInstance();
+                case LM:
+                    return src.main.java.encryptors.LogisticMap.getInstance();
                 default:
                     throw new IllegalArgumentException();
             }
