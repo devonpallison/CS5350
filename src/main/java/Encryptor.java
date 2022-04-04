@@ -1,8 +1,6 @@
 package src.main.java;
 
-import src.main.java.encryptors.AlteredSineLogisticBasedTentMap;
-import src.main.java.encryptors.CubicTentMap;
-import src.main.java.encryptors.EncryptionAlgorithm;
+import src.main.java.encryptors.*;
 import src.main.java.util.FileUtil;
 
 import java.io.*;
@@ -14,7 +12,8 @@ public class Encryptor {
     public enum Algorithm {
         ASLBTM,
         LM,
-        CTM;
+        CTM,
+        TM;
 
         public EncryptionAlgorithm getEncryptionAlgorithm() {
             switch (this) {
@@ -23,7 +22,9 @@ public class Encryptor {
                 case CTM:
                     return CubicTentMap.getInstance();
                 case LM:
-                    return src.main.java.encryptors.LogisticMap.getInstance();
+                    return LogisticMap.getInstance();
+                case TM:
+                    return TentMap.getInstance();
                 default:
                     throw new IllegalArgumentException();
             }
@@ -43,8 +44,13 @@ public class Encryptor {
 
         final byte[] cypherText = encrypt(plainText, chosenAlg);
 
-        System.out.println("Writing image to file " + encryptionOutputFilePath);
-        FileUtil.writeByteArrayToImage(cypherText, encryptionOutputFilePath);
+        try {
+            System.out.println("Writing image to file " + encryptionOutputFilePath);
+            FileUtil.writeByteArrayToImage(cypherText, encryptionOutputFilePath);
+        } catch(Exception e) {
+            System.out.println("Could not write image to file");
+            System.out.println("Exception: " + e.getMessage());
+        }
 
         final byte[] plainText2 = decrypt(cypherText, chosenAlg);
 

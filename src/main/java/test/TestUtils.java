@@ -26,4 +26,8 @@ public class TestUtils {
             }
         }
     }
+
+    public static void fail() {
+        throw new RuntimeException("Test failed");
+    }
 }
