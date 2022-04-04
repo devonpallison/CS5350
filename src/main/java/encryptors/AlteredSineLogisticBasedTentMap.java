@@ -1,7 +1,8 @@
 package src.main.java.encryptors;
 
 /**
- * Implementation of the altered-sine logistic-based tent map image encryption algorithm.
+ * Implementation of the altered-sine logistic-based tent map image encryption algorithm from
+ * http://www.jocm.us/uploadfile/2021/1222/20211222032407398.pdf
  * This system is chaotic for r values in the range [0,4].
  * The mapping is defined by the piecewise function
  * f(x) = {
@@ -24,9 +25,9 @@ public class AlteredSineLogisticBasedTentMap extends EncryptionAlgorithm {
     @Override
     public double applyMap(double x) {
         if (x < 0.5) {
-            return 4 - (r / 4) * Math.sin(3.14159 * x) + (r / 2 * x);
+            return ((4.0 - r) / 4.0) * Math.sin(3.14159 * x) + (r / 2.0 * x);
         } else {
-            return (4 - r) * x * (1 - x) + ((r / 2) * (1 - x));
+            return (4.0 - r) * x * (1.0 - x) + ((r / 2.0) * (1 - x));
         }
     }
 }

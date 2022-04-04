@@ -3,7 +3,8 @@ package src.main.java.encryptors;
 import src.main.java.util.MathOperations;
 
 /**
- * Implementation of the cubic tent map image encryption.
+ * Implementation of the cubic tent map image encryption from
+ * http://www.jocm.us/uploadfile/2021/1222/20211222032407398.pdf
  * Map is chaotic for r s.t. 0 <= r <= 4
  *
  * Map is the piecewise function
