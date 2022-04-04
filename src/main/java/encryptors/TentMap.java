@@ -11,9 +11,4 @@ public class TentMap extends EncryptionAlgorithm {
             return r * (1 - x);
         }
     }
-
-    @Override
-    public double initialConditionY() {
-        return 0;
-    }
 }

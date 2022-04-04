@@ -22,9 +22,4 @@ public class AlteredSineLogisticBasedTentMap extends EncryptionAlgorithm {
         }
         return ret;
     }
-
-    @Override
-    public double initialConditionY() {
-        return 0;
-    }
 }
