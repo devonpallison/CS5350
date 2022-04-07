@@ -33,4 +33,9 @@ public class CubicTentMap extends EncryptionAlgorithm {
             return MathOperations.nonNegativeMod((4.0 - 0.75 * r) * x * (1 - x * x) + (r / 2.0) * (1 - x), 1);
         }
     }
+
+    @Override
+    public String getDescription() {
+        return "CTM";
+    }
 }

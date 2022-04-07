@@ -28,4 +28,9 @@ public class TentMap extends EncryptionAlgorithm {
             return r * (1 - x);
         }
     }
+
+    @Override
+    public String getDescription() {
+        return "TM";
+    }
 }

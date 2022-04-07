@@ -1,7 +1,11 @@
 package src.main.java.encryptors;
 
 import src.main.java.util.BitOperations;
+import src.main.java.util.ImageUtils;
 import src.main.java.util.MathOperations;
+
+import java.awt.image.BufferedImage;
+import java.nio.Buffer;
 
 /*
 Encryption algorithm taken from
@@ -25,6 +29,24 @@ public abstract class EncryptionAlgorithm {
      * @param x input
      */
     public abstract double applyMap(final double x);
+
+    /**
+     * Return the description of this algorithm.
+     */
+    public abstract String getDescription();
+
+    /**
+     * Encrypts the entry byte array representation of an image in chunks of RGB values.
+     *
+     * @param plainText byte array representation of an image. Assume to be in order
+     *                  R1,G1,B1,G2,G2,B2,...,RnGnBn
+     * @return encrypted image
+     */
+    public BufferedImage encrypt(BufferedImage plainText) {
+        final byte[] pixels = ImageUtils.getPixelsOfImage(plainText);
+        final byte[] encryptedPixels = encrypt(pixels);
+        return ImageUtils.changePixelsOfImage(plainText, encryptedPixels);
+    }
 
     /**
      * Encrypts the entry byte array representation of an image in chunks of RGB values.
@@ -85,6 +107,18 @@ public abstract class EncryptionAlgorithm {
         }
 
         return cypherText;
+    }
+
+    /**
+     * Decrypts the input byte array into a representation of an image in chunks of RGB values.
+     *
+     * @param cypherText encrypted image
+     * @return decrypted image
+     */
+    public BufferedImage decrypt(BufferedImage cypherText) {
+        final byte[] pixels = ImageUtils.getPixelsOfImage(cypherText);
+        final byte[] decryptedPixels = decrypt(pixels);
+        return ImageUtils.changePixelsOfImage(cypherText, decryptedPixels);
     }
 
     /**

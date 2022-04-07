@@ -26,4 +26,8 @@ public class LogisticMap extends EncryptionAlgorithm {
         return R * x * (1 - x);
     }
 
+    @Override
+    public String getDescription() {
+        return "LM";
+    }
 }

@@ -30,4 +30,9 @@ public class AlteredSineLogisticBasedTentMap extends EncryptionAlgorithm {
             return (4.0 - r) * x * (1.0 - x) + ((r / 2.0) * (1 - x));
         }
     }
+
+    @Override
+    public String getDescription() {
+        return "ASLBTM";
+    }
 }
