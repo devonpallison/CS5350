@@ -15,6 +15,8 @@ public abstract class EncryptionAlgorithm {
     //modify the key string every 16 pixels
     private static final int MODIFY_KEYS_COUNTER = 16;
 
+    private static final boolean DEBUG = false;
+
     //initial key is 80 bits
     protected static final int[] INITIAL_KEY1 = {0, 1, 1, 0, 1, 1, 0, 1};
     protected static final int[] INITIAL_KEY2 = {0, 1, 1, 0, 1, 1, 0, 1};
@@ -25,7 +27,7 @@ public abstract class EncryptionAlgorithm {
     protected static final int[] INITIAL_KEY7 = {0, 1, 1, 0, 1, 1, 0, 1};
     protected static final int[] INITIAL_KEY8 = {0, 1, 1, 0, 1, 1, 0, 1};
     protected static final int[] INITIAL_KEY9 = {0, 1, 1, 0, 1, 1, 0, 1};
-    protected static final int[] INITIAL_KEY10 = {0, 0, 0, 0, 0, 0, 1, 0};
+    protected static final int[] INITIAL_KEY10 = {0, 1, 1, 0, 1, 1, 0, 1};
 
     //keys are modified as we progress through the encryption
     protected static int[] key1 = INITIAL_KEY1;
@@ -86,10 +88,12 @@ public abstract class EncryptionAlgorithm {
             byte byteRed = plainText[i];
             byte byteGreen = plainText[i + 1];
             byte byteBlue = plainText[i + 2];
+            debug("Encrypting red=" + byteRed + ", green=" + byteGreen + ", blue=" + byteBlue);
 
             for(int j = 0; j < BitOperations.toBase10(key10); j++) {
                 double y = applyMap(y0);
                 y0 = y;
+                debug("Decrypting with y=" + y);
                 if (inRange(y, 0.1, 0.13) || inRange(y, 0.34, 0.37) || inRange(y, 0.58, 0.62)) {
                     byteRed = (byte) ~byteRed;
                     byteGreen = (byte) ~byteGreen;
@@ -171,10 +175,20 @@ public abstract class EncryptionAlgorithm {
             byte byteRed = cypherText[i];
             byte byteGreen = cypherText[i + 1];
             byte byteBlue = cypherText[i + 2];
+            debug("Decrypting red=" + byteRed + ", green=" + byteGreen + ", blue=" + byteBlue);
 
-            for(int j = 0; j < BitOperations.toBase10(key10); j++) {
-                double y = applyMap(y0);
-                y0 = y;
+            final int base10Key10 = BitOperations.toBase10(key10);
+            double[] ys = new double[base10Key10];
+            double y = y0;
+            for(int j = 0; j < base10Key10; j++) {
+                y = applyMap(y);
+                ys[j] = y;
+            }
+            y0 = y;
+
+            for(int j = 0; j < base10Key10; j++) {
+                y = ys[ys.length - j - 1];
+                debug("Decrypting with y=" + y);
                 if (inRange(y, 0.1, 0.13) || inRange(y, 0.34, 0.37) || inRange(y, 0.58, 0.62)) {
                     byteRed = (byte) ~byteRed;
                     byteGreen = (byte) ~byteGreen;
@@ -371,4 +385,9 @@ public abstract class EncryptionAlgorithm {
         key9 = BitOperations.toBitString((BitOperations.toBase10(key9) + BitOperations.toBase10(key10)) % 256);
     }
 
+    private void debug(final String s) {
+        if(DEBUG) {
+            System.out.println(s);
+        }
+    }
 }
