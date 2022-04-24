@@ -12,16 +12,32 @@ Encryption algorithm taken from
  https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.88.5203&rep=rep1&type=pdf
  */
 public abstract class EncryptionAlgorithm {
-    protected static final int[] key1 = {0, 1, 1, 0, 1, 1, 0, 1};
-    protected static final int[] key2 = {0, 1, 1, 0, 1, 1, 0, 1};
-    protected static final int[] key3 = {0, 1, 1, 0, 1, 1, 0, 1};
-    protected static final int[] key4 = {0, 1, 1, 0, 1, 1, 0, 1};
-    protected static final int[] key5 = {0, 1, 1, 0, 1, 1, 0, 1};
-    protected static final int[] key6 = {0, 1, 1, 0, 1, 1, 0, 1};
-    protected static final int[] key7 = {0, 1, 1, 0, 1, 1, 0, 1};
-    protected static final int[] key8 = {0, 1, 1, 0, 1, 1, 0, 1};
-    protected static final int[] key9 = {0, 1, 1, 0, 1, 1, 0, 1};
-    protected static final int[] key10 = {0, 1, 1, 0, 1, 1, 0, 1};
+    //modify the key string every 16 pixels
+    private static final int MODIFY_KEYS_COUNTER = 16;
+
+    //initial key is 80 bits
+    protected static final int[] INITIAL_KEY1 = {0, 1, 1, 0, 1, 1, 0, 1};
+    protected static final int[] INITIAL_KEY2 = {0, 1, 1, 0, 1, 1, 0, 1};
+    protected static final int[] INITIAL_KEY3 = {0, 1, 1, 0, 1, 1, 0, 1};
+    protected static final int[] INITIAL_KEY4 = {0, 1, 1, 0, 1, 1, 0, 1};
+    protected static final int[] INITIAL_KEY5 = {0, 1, 1, 0, 1, 1, 0, 1};
+    protected static final int[] INITIAL_KEY6 = {0, 1, 1, 0, 1, 1, 0, 1};
+    protected static final int[] INITIAL_KEY7 = {0, 1, 1, 0, 1, 1, 0, 1};
+    protected static final int[] INITIAL_KEY8 = {0, 1, 1, 0, 1, 1, 0, 1};
+    protected static final int[] INITIAL_KEY9 = {0, 1, 1, 0, 1, 1, 0, 1};
+    protected static final int[] INITIAL_KEY10 = {0, 0, 0, 0, 0, 0, 1, 0};
+
+    //keys are modified as we progress through the encryption
+    protected static int[] key1 = INITIAL_KEY1;
+    protected static int[] key2 = INITIAL_KEY2;
+    protected static int[] key3 = INITIAL_KEY3;
+    protected static int[] key4 = INITIAL_KEY4;
+    protected static int[] key5 = INITIAL_KEY5;
+    protected static int[] key6 = INITIAL_KEY6;
+    protected static int[] key7 = INITIAL_KEY7;
+    protected static int[] key8 = INITIAL_KEY8;
+    protected static int[] key9 = INITIAL_KEY9;
+    protected static int[] key10 = INITIAL_KEY10;
 
     /**
      * Apply the chaotic transformation.
@@ -59,52 +75,65 @@ public abstract class EncryptionAlgorithm {
         if (plainText.length % 3 != 0) {
             throw new RuntimeException("Expect R,G,B pattern for byte array here");
         }
+        System.out.println("Encrypting image with " + plainText.length + " pixels.");
+        long oldTime = System.currentTimeMillis();
 
+        resetKeys();
         final byte[] cypherText = new byte[plainText.length];
         double y0 = applyMap(initialConditionY());
+        int modifyKeysCounter = MODIFY_KEYS_COUNTER;
         for (int i = 0; i < plainText.length; i += 3) {
             byte byteRed = plainText[i];
             byte byteGreen = plainText[i + 1];
             byte byteBlue = plainText[i + 2];
 
-            double y = applyMap(y0);
-            y0 = y;
-            if (inRange(y, 0.1, 0.13) || inRange(y, 0.34, 0.37) || inRange(y, 0.58, 0.62)) {
-                byteRed = (byte) ~byteRed;
-                byteGreen = (byte) ~byteGreen;
-                byteBlue = (byte) ~byteBlue;
-            } else if (inRange(y, 0.13, 0.16) || inRange(y, 0.37, 0.40) || inRange(y, 0.62, 0.66)) {
-                byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key4));
-                byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key5));
-                byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key6));
-            } else if (inRange(y, 0.16, 0.19) || inRange(y, 0.40, 0.43) || inRange(y, 0.66, 0.70)) {
-                byteRed = (byte) (((int) byteRed) + ((int) BitOperations.convertToByte(key4)) + ((int) BitOperations.convertToByte(key5)));
-                byteGreen = (byte) (((int) byteGreen) + ((int) BitOperations.convertToByte(key5)) + ((int) BitOperations.convertToByte(key6)));
-                byteBlue = (byte) (((int) byteBlue) + ((int) BitOperations.convertToByte(key6)) + ((int) BitOperations.convertToByte(key4)));
-            } else if (inRange(y, 0.19, 0.22) || inRange(y, 0.43, 0.46) || inRange(y, 0.70, 0.74)) {
-                byteRed = (byte) (~(byteRed ^ BitOperations.convertToByte(key4)));
-                byteGreen = (byte) (~(byteGreen ^ BitOperations.convertToByte(key5)));
-                byteBlue = (byte) (~(byteBlue ^ BitOperations.convertToByte(key6)));
-            } else if (inRange(y, 0.22, 0.25) || inRange(y, 0.46, 0.49) || inRange(y, 0.74, 0.78)) {
-                byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key7));
-                byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key8));
-                byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key9));
-            } else if (inRange(y, 0.25, 0.28) || inRange(y, 0.49, 0.52) || inRange(y, 0.78, 0.82)) {
-                byteRed = (byte) (((int) byteRed) + ((int) BitOperations.convertToByte(key7)) + ((int) BitOperations.convertToByte(key8)));
-                byteGreen = (byte) (((int) byteGreen) + ((int) BitOperations.convertToByte(key8)) + ((int) BitOperations.convertToByte(key9)));
-                byteBlue = (byte) (((int) byteBlue) + ((int) BitOperations.convertToByte(key9)) + ((int) BitOperations.convertToByte(key7)));
-            } else if (inRange(y, 0.28, 0.31) || inRange(y, 0.52, 0.55) || inRange(y, 0.82, 0.86)) {
-                byteRed = (byte) (~(byteRed ^ BitOperations.convertToByte(key7)));
-                byteGreen = (byte) (~(byteGreen ^ BitOperations.convertToByte(key8)));
-                byteBlue = (byte) (~(byteBlue ^ BitOperations.convertToByte(key9)));
-            } else {
-                //do nothing
+            for(int j = 0; j < BitOperations.toBase10(key10); j++) {
+                double y = applyMap(y0);
+                y0 = y;
+                if (inRange(y, 0.1, 0.13) || inRange(y, 0.34, 0.37) || inRange(y, 0.58, 0.62)) {
+                    byteRed = (byte) ~byteRed;
+                    byteGreen = (byte) ~byteGreen;
+                    byteBlue = (byte) ~byteBlue;
+                } else if (inRange(y, 0.13, 0.16) || inRange(y, 0.37, 0.40) || inRange(y, 0.62, 0.66)) {
+                    byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key4));
+                    byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key5));
+                    byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key6));
+                } else if (inRange(y, 0.16, 0.19) || inRange(y, 0.40, 0.43) || inRange(y, 0.66, 0.70)) {
+                    byteRed = (byte) (BitOperations.toBase10(BitOperations.toBitString(byteRed)) + ((int) BitOperations.convertToByte(key4)) + ((int) BitOperations.convertToByte(key5)));
+                    byteGreen = (byte) ((BitOperations.toBase10(BitOperations.toBitString(byteGreen))) + ((int) BitOperations.convertToByte(key5)) + ((int) BitOperations.convertToByte(key6)));
+                    byteBlue = (byte) ((BitOperations.toBase10(BitOperations.toBitString(byteBlue))) + ((int) BitOperations.convertToByte(key6)) + ((int) BitOperations.convertToByte(key4)));
+                } else if (inRange(y, 0.19, 0.22) || inRange(y, 0.43, 0.46) || inRange(y, 0.70, 0.74)) {
+                    byteRed = (byte) (~(byteRed ^ BitOperations.convertToByte(key4)));
+                    byteGreen = (byte) (~(byteGreen ^ BitOperations.convertToByte(key5)));
+                    byteBlue = (byte) (~(byteBlue ^ BitOperations.convertToByte(key6)));
+                } else if (inRange(y, 0.22, 0.25) || inRange(y, 0.46, 0.49) || inRange(y, 0.74, 0.78)) {
+                    byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key7));
+                    byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key8));
+                    byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key9));
+                } else if (inRange(y, 0.25, 0.28) || inRange(y, 0.49, 0.52) || inRange(y, 0.78, 0.82)) {
+                    byteRed = (byte) ((BitOperations.toBase10(BitOperations.toBitString(byteRed))) + ((int) BitOperations.convertToByte(key7)) + ((int) BitOperations.convertToByte(key8)));
+                    byteGreen = (byte) ((BitOperations.toBase10(BitOperations.toBitString(byteGreen))) + ((int) BitOperations.convertToByte(key8)) + ((int) BitOperations.convertToByte(key9)));
+                    byteBlue = (byte) ((BitOperations.toBase10(BitOperations.toBitString(byteBlue))) + ((int) BitOperations.convertToByte(key9)) + ((int) BitOperations.convertToByte(key7)));
+                } else if (inRange(y, 0.28, 0.31) || inRange(y, 0.52, 0.55) || inRange(y, 0.82, 0.86)) {
+                    byteRed = (byte) (~(byteRed ^ BitOperations.convertToByte(key7)));
+                    byteGreen = (byte) (~(byteGreen ^ BitOperations.convertToByte(key8)));
+                    byteBlue = (byte) (~(byteBlue ^ BitOperations.convertToByte(key9)));
+                } else {
+                    //do nothing
+                }
             }
 
             cypherText[i] = byteRed;
             cypherText[i + 1] = byteGreen;
             cypherText[i + 2] = byteBlue;
+
+            modifyKeysCounter--;
+            if(modifyKeysCounter == 0) {
+                modifyKeys();
+                modifyKeysCounter = MODIFY_KEYS_COUNTER;
+            }
         }
+        System.out.println("Finished encryption in " + (System.currentTimeMillis() - oldTime));
 
         return cypherText;
     }
@@ -131,52 +160,65 @@ public abstract class EncryptionAlgorithm {
         if (cypherText.length % 3 != 0) {
             throw new RuntimeException("Expect R,G,B pattern for byte array here");
         }
+        System.out.println("Decrypting image with " + cypherText.length + " pixels.");
+        long oldTime = System.currentTimeMillis();
 
+        resetKeys();
         final byte[] plainText = new byte[cypherText.length];
         double y0 = applyMap(initialConditionY());
+        int modifyKeysCounter = MODIFY_KEYS_COUNTER;
         for (int i = 0; i < cypherText.length; i += 3) {
             byte byteRed = cypherText[i];
             byte byteGreen = cypherText[i + 1];
             byte byteBlue = cypherText[i + 2];
 
-            double y = applyMap(y0);
-            y0 = y;
-            if (inRange(y, 0.1, 0.13) || inRange(y, 0.34, 0.37) || inRange(y, 0.58, 0.62)) {
-                byteRed = (byte) ~byteRed;
-                byteGreen = (byte) ~byteGreen;
-                byteBlue = (byte) ~byteBlue;
-            } else if (inRange(y, 0.13, 0.16) || inRange(y, 0.37, 0.40) || inRange(y, 0.62, 0.66)) {
-                byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key4));
-                byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key5));
-                byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key6));
-            } else if (inRange(y, 0.16, 0.19) || inRange(y, 0.40, 0.43) || inRange(y, 0.66, 0.70)) {
-                byteRed = (byte) (((int) byteRed) + 256 - ((int) BitOperations.convertToByte(key4)) - ((int) BitOperations.convertToByte(key5)));
-                byteGreen = (byte) (((int) byteGreen) + 256 - ((int) BitOperations.convertToByte(key5)) - ((int) BitOperations.convertToByte(key6)));
-                byteBlue = (byte) (((int) byteBlue) + 256 - ((int) BitOperations.convertToByte(key6)) - ((int) BitOperations.convertToByte(key4)));
-            } else if (inRange(y, 0.19, 0.22) || inRange(y, 0.43, 0.46) || inRange(y, 0.70, 0.74)) {
-                byteRed = (byte) ((~byteRed) ^ BitOperations.convertToByte(key4));
-                byteGreen = (byte) ((~byteGreen) ^ BitOperations.convertToByte(key5));
-                byteBlue = (byte) ((~byteBlue) ^ BitOperations.convertToByte(key6));
-            } else if (inRange(y, 0.22, 0.25) || inRange(y, 0.46, 0.49) || inRange(y, 0.74, 0.78)) {
-                byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key7));
-                byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key8));
-                byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key9));
-            } else if (inRange(y, 0.25, 0.28) || inRange(y, 0.49, 0.52) || inRange(y, 0.78, 0.82)) {
-                byteRed = (byte) (((int) byteRed) + 256 - ((int) BitOperations.convertToByte(key7)) - ((int) BitOperations.convertToByte(key8)));
-                byteGreen = (byte) (((int) byteGreen) + 256 - ((int) BitOperations.convertToByte(key8)) - ((int) BitOperations.convertToByte(key9)));
-                byteBlue = (byte) (((int) byteBlue) + 256 - ((int) BitOperations.convertToByte(key9)) - ((int) BitOperations.convertToByte(key7)));
-            } else if (inRange(y, 0.28, 0.31) || inRange(y, 0.52, 0.55) || inRange(y, 0.82, 0.86)) {
-                byteRed = (byte) ((~byteRed) ^ BitOperations.convertToByte(key7));
-                byteGreen = (byte) ((~byteGreen) ^ BitOperations.convertToByte(key8));
-                byteBlue = (byte) ((~byteBlue) ^ BitOperations.convertToByte(key9));
-            } else {
-                //do nothing
+            for(int j = 0; j < BitOperations.toBase10(key10); j++) {
+                double y = applyMap(y0);
+                y0 = y;
+                if (inRange(y, 0.1, 0.13) || inRange(y, 0.34, 0.37) || inRange(y, 0.58, 0.62)) {
+                    byteRed = (byte) ~byteRed;
+                    byteGreen = (byte) ~byteGreen;
+                    byteBlue = (byte) ~byteBlue;
+                } else if (inRange(y, 0.13, 0.16) || inRange(y, 0.37, 0.40) || inRange(y, 0.62, 0.66)) {
+                    byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key4));
+                    byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key5));
+                    byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key6));
+                } else if (inRange(y, 0.16, 0.19) || inRange(y, 0.40, 0.43) || inRange(y, 0.66, 0.70)) {
+                    byteRed = (byte) ((BitOperations.toBase10(BitOperations.toBitString(byteRed))) + 256 - ((int) BitOperations.convertToByte(key4)) - ((int) BitOperations.convertToByte(key5)));
+                    byteGreen = (byte) ((BitOperations.toBase10(BitOperations.toBitString(byteGreen))) + 256 - ((int) BitOperations.convertToByte(key5)) - ((int) BitOperations.convertToByte(key6)));
+                    byteBlue = (byte) ((BitOperations.toBase10(BitOperations.toBitString(byteBlue))) + 256 - ((int) BitOperations.convertToByte(key6)) - ((int) BitOperations.convertToByte(key4)));
+                } else if (inRange(y, 0.19, 0.22) || inRange(y, 0.43, 0.46) || inRange(y, 0.70, 0.74)) {
+                    byteRed = (byte) ((~byteRed) ^ BitOperations.convertToByte(key4));
+                    byteGreen = (byte) ((~byteGreen) ^ BitOperations.convertToByte(key5));
+                    byteBlue = (byte) ((~byteBlue) ^ BitOperations.convertToByte(key6));
+                } else if (inRange(y, 0.22, 0.25) || inRange(y, 0.46, 0.49) || inRange(y, 0.74, 0.78)) {
+                    byteRed = (byte) (byteRed ^ BitOperations.convertToByte(key7));
+                    byteGreen = (byte) (byteGreen ^ BitOperations.convertToByte(key8));
+                    byteBlue = (byte) (byteBlue ^ BitOperations.convertToByte(key9));
+                } else if (inRange(y, 0.25, 0.28) || inRange(y, 0.49, 0.52) || inRange(y, 0.78, 0.82)) {
+                    byteRed = (byte) ((BitOperations.toBase10(BitOperations.toBitString(byteRed))) + 256 - ((int) BitOperations.convertToByte(key7)) - ((int) BitOperations.convertToByte(key8)));
+                    byteGreen = (byte) ((BitOperations.toBase10(BitOperations.toBitString(byteGreen))) + 256 - ((int) BitOperations.convertToByte(key8)) - ((int) BitOperations.convertToByte(key9)));
+                    byteBlue = (byte) ((BitOperations.toBase10(BitOperations.toBitString(byteBlue))) + 256 - ((int) BitOperations.convertToByte(key9)) - ((int) BitOperations.convertToByte(key7)));
+                } else if (inRange(y, 0.28, 0.31) || inRange(y, 0.52, 0.55) || inRange(y, 0.82, 0.86)) {
+                    byteRed = (byte) ((~byteRed) ^ BitOperations.convertToByte(key7));
+                    byteGreen = (byte) ((~byteGreen) ^ BitOperations.convertToByte(key8));
+                    byteBlue = (byte) ((~byteBlue) ^ BitOperations.convertToByte(key9));
+                } else {
+                    //do nothing
+                }
             }
 
             plainText[i] = byteRed;
             plainText[i + 1] = byteGreen;
             plainText[i + 2] = byteBlue;
+
+            modifyKeysCounter--;
+            if(modifyKeysCounter == 0) {
+                modifyKeys();
+                modifyKeysCounter = MODIFY_KEYS_COUNTER;
+            }
         }
+        System.out.println("Finished decryption in " + (System.currentTimeMillis() - oldTime));
 
         return plainText;
     }
@@ -300,6 +342,33 @@ public abstract class EncryptionAlgorithm {
         }
 
         return pValues;
+    }
+
+    private void resetKeys() {
+        key1 = INITIAL_KEY1;
+        key2 = INITIAL_KEY2;
+        key3 = INITIAL_KEY3;
+        key4 = INITIAL_KEY4;
+        key5 = INITIAL_KEY5;
+        key6 = INITIAL_KEY6;
+        key7 = INITIAL_KEY7;
+        key8 = INITIAL_KEY8;
+        key9 = INITIAL_KEY9;
+    }
+    /*
+    Every 16 pixels, we modify the keys with
+    Ki = (Ki + K10) mod 256 for 1 <= i <= 9
+     */
+    private void modifyKeys() {
+        key1 = BitOperations.toBitString((BitOperations.toBase10(key1) + BitOperations.toBase10(key10)) % 256);
+        key2 = BitOperations.toBitString((BitOperations.toBase10(key2) + BitOperations.toBase10(key10)) % 256);
+        key3 = BitOperations.toBitString((BitOperations.toBase10(key3) + BitOperations.toBase10(key10)) % 256);
+        key4 = BitOperations.toBitString((BitOperations.toBase10(key4) + BitOperations.toBase10(key10)) % 256);
+        key5 = BitOperations.toBitString((BitOperations.toBase10(key5) + BitOperations.toBase10(key10)) % 256);
+        key6 = BitOperations.toBitString((BitOperations.toBase10(key6) + BitOperations.toBase10(key10)) % 256);
+        key7 = BitOperations.toBitString((BitOperations.toBase10(key7) + BitOperations.toBase10(key10)) % 256);
+        key8 = BitOperations.toBitString((BitOperations.toBase10(key8) + BitOperations.toBase10(key10)) % 256);
+        key9 = BitOperations.toBitString((BitOperations.toBase10(key9) + BitOperations.toBase10(key10)) % 256);
     }
 
 }

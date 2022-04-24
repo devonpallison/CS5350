@@ -43,7 +43,9 @@ public class TestEndToEnd {
         final BufferedImage plainText = ImageIO.read(new File(inputFilePath));
         final BufferedImage cypherText = encryptionAlgorithm.encrypt(plainText);
 
-        ImageIO.write(cypherText, Encryptor.OUTPUT_FORMAT, new File("encrypted" + encryptionAlgorithm.getDescription() + "." + Encryptor.OUTPUT_FORMAT));
+        final String encryptedPath = "encrypted" + encryptionAlgorithm.getDescription() + "." + Encryptor.OUTPUT_FORMAT;
+        System.out.println("Writing encrypted image to file " + encryptedPath);
+        ImageIO.write(cypherText, Encryptor.OUTPUT_FORMAT, new File(encryptedPath));
 
 
         final BufferedImage plainText2 = encryptionAlgorithm.decrypt(cypherText);

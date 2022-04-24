@@ -28,6 +28,20 @@ public class BitOperations {
         return bitString;
     }
 
+    public static int[] toBitString(final int integer) {
+        int[] bitString = new int[8];
+        String rep = Integer.toBinaryString(integer);
+        for(int i = bitString.length - rep.length(); i < bitString.length; i++) {
+            if(rep.charAt(i - (bitString.length - rep.length())) == '0') {
+                bitString[i] = 0;
+            } else {
+                bitString[i] = 1;
+            }
+        }
+
+        return bitString;
+    }
+
     public static byte invert(final byte b) {
         return convertToByte(invert(toBitString(b)));
     }
