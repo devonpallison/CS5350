@@ -30,6 +30,27 @@ public class ImageUtils {
         return pixels;
     }
 
+    public static byte[][] getPixelsOfImage2D(final BufferedImage bufferedImage) {
+        final int width = bufferedImage.getWidth();
+        final int height = bufferedImage.getHeight();
+        final byte[][] pixels = new byte[width * 3][height];
+
+        for(int x = 0; x < width; x++) {
+            for(int y = 0; y < height; y++) {
+                int rgb = bufferedImage.getRGB(x, y);
+                Color color = new Color(rgb);
+                byte red = (byte) color.getRed();
+                byte green = (byte) color.getGreen();
+                byte blue = (byte) color.getBlue();
+                pixels[x][y] = red;
+                pixels[x+1][y] = green;
+                pixels[x+2][y] = blue;
+            }
+        }
+
+        return pixels;
+    }
+
     public static BufferedImage changePixelsOfImage(final BufferedImage bufferedImage, final byte[] newPixels) {
         final int width = bufferedImage.getWidth();
         final int height = bufferedImage.getHeight();
