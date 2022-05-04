@@ -22,23 +22,27 @@ public class CorrelationAnalysis {
         final String myDirectoryPath = Encryptor.INPUT_IMAGE_FILE_PREFIX + "/mod3paintings/";
         File dir = new File(myDirectoryPath);
         File[] directoryListing = dir.listFiles();
+        final CsvWriter csvWriter = new CsvWriter();
+        csvWriter.addWords("File", "Encryption Method", "Horizontal Correlation", "VerticalCorrelation");
+
         if (directoryListing != null) {
             for (File child : directoryListing) {
                 final String inputFilePath = child.getAbsolutePath();
 
                 System.out.println("Reading image file " + inputFilePath);
                 final BufferedImage plainText = ImageIO.read(new File(inputFilePath));
-                final byte[] imageBytes1 = ImageUtils.getPixelsOfImage(plainText);
 
                 int startPixelWidth = new Random().nextInt(plainText.getWidth() - SAMPLE_SIZE);
                 int startPixelHeight = new Random().nextInt(plainText.getHeight() - SAMPLE_SIZE);
                 int[][] intArray = new int[SAMPLE_SIZE][SAMPLE_SIZE];
                 byte[] bytes = new byte[SAMPLE_SIZE*SAMPLE_SIZE*3];
                 int k = 0;
-                for(int i = startPixelWidth; i < SAMPLE_SIZE; i++) {
-                    for (int j = startPixelHeight; j < SAMPLE_SIZE; j++) {
-                        intArray[i][j] = plainText.getRGB(i, j);
-                        Color color = new Color(intArray[i][j]);
+                int xC = 0;
+                for(int i = startPixelWidth; i < startPixelWidth + SAMPLE_SIZE; i++) {
+                    int yC = 0;
+                    for (int j = startPixelHeight; j < startPixelHeight + SAMPLE_SIZE; j++) {
+                        intArray[xC][yC] = plainText.getRGB(i, j);
+                        Color color = new Color(intArray[xC][yC]);
                         byte red = (byte) color.getRed();
                         byte green = (byte) color.getGreen();
                         byte blue = (byte) color.getBlue();
@@ -46,37 +50,54 @@ public class CorrelationAnalysis {
                         bytes[k+1] = green;
                         bytes[k+2] = blue;
                         k+=3;
+                        yC++;
                     }
+
+                    xC++;
                 }
-//                calculateCorrelation("Unencrypted", intArray, child.getName(), false);
-//                calculateCorrelation("Unencrypted", intArray, child.getName(), true);
+                final String fileName = child.getName();
+                String method = "Unencrypted";
+                double horizontalCorrelation = calculateCorrelation(method, intArray, fileName, false);
+                double verticalCorrelation = calculateCorrelation(method, intArray, fileName, true);
+                csvWriter.addWords(fileName, method, horizontalCorrelation + "", verticalCorrelation + "");
 
+                method = "ASLBTM";
                 final byte[] encryptedImageASLBTM = AlteredSineLogisticBasedTentMap.getInstance().encrypt(bytes);
-                calculateCorrelation("ASLBTM", encryptedImageASLBTM, child.getName(), false);
-                calculateCorrelation("ASLBTM", encryptedImageASLBTM, child.getName(), true);
+                horizontalCorrelation = calculateCorrelation(method, encryptedImageASLBTM, fileName, false);
+                verticalCorrelation = calculateCorrelation(method, encryptedImageASLBTM, fileName, true);
+                csvWriter.addWords(fileName, method, horizontalCorrelation + "", verticalCorrelation + "");
 
+                method = "CTM";
                 final byte[] encryptedImageCTM = CubicTentMap.getInstance().encrypt(bytes);
-                calculateCorrelation("CTM", encryptedImageCTM, child.getName(), false);
-                calculateCorrelation("CTM", encryptedImageCTM, child.getName(), true);
+                horizontalCorrelation = calculateCorrelation(method, encryptedImageCTM, fileName, false);
+                verticalCorrelation = calculateCorrelation(method, encryptedImageCTM, fileName, true);
+                csvWriter.addWords(fileName, method, horizontalCorrelation + "", verticalCorrelation + "");
 
+                method = "LM";
                 final byte[] encryptedImageLM = LogisticMap.getInstance().encrypt(bytes);
-                calculateCorrelation("LM", encryptedImageLM, child.getName(), false);
-                calculateCorrelation("LM", encryptedImageLM, child.getName(), true);
+                horizontalCorrelation = calculateCorrelation(method, encryptedImageLM, fileName, false);
+                verticalCorrelation = calculateCorrelation(method, encryptedImageLM, fileName, true);
+                csvWriter.addWords(fileName, method, horizontalCorrelation + "", verticalCorrelation + "");
 
+                method = "TM";
                 final byte[] encryptedImageTM = TentMap.getInstance().encrypt(bytes);
-                calculateCorrelation("TM", encryptedImageTM, child.getName(), false);
-                calculateCorrelation("TM", encryptedImageTM, child.getName(), true);
+                horizontalCorrelation = calculateCorrelation(method, encryptedImageTM, fileName, false);
+                verticalCorrelation = calculateCorrelation(method, encryptedImageTM, fileName, true);
+                csvWriter.addWords(fileName, method, horizontalCorrelation + "", verticalCorrelation + "");
             }
         }
+
+        csvWriter.finish("output.csv");
     }
 
-    private static void calculateCorrelation(String map, byte[] rgbValues, String file, boolean vertical) {
-        calculateCorrelation(map, AnalysisTools.getPixelsAsIntArrayArray(rgbValues, SAMPLE_SIZE, SAMPLE_SIZE), file, vertical);
+    private static double calculateCorrelation(String map, byte[] rgbValues, String file, boolean vertical) {
+        return calculateCorrelation(map, AnalysisTools.getPixelsAsIntArrayArray(rgbValues, SAMPLE_SIZE, SAMPLE_SIZE), file, vertical);
     }
 
-    private static void calculateCorrelation(String map, int[][] rgbValues, String file, boolean vertical) {
+    private static double calculateCorrelation(String map, int[][] rgbValues, String file, boolean vertical) {
         double correlation = vertical ? correlationCoefficientV(rgbValues) : correlationCoefficientH(rgbValues);
         System.out.println(map + " correlation between " + (vertical ? "vertical" : "horizontal") + " pixels for file" + file + " = " + correlation);
+        return correlation;
     }
 
     private static double correlationCoefficientV(final int[][] values) {
