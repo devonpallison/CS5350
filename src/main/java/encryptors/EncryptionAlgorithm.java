@@ -17,8 +17,11 @@ public abstract class EncryptionAlgorithm {
 
     private static final boolean DEBUG = false;
 
+    public static boolean ALTER_KEY = false;
+
     //initial key is 80 bits
     protected static final int[] INITIAL_KEY1 = {0, 1, 1, 0, 1, 1, 0, 1};
+    protected static final int[] INITIAL_KEY1_ALTERED = {1, 1, 1, 0, 1, 1, 0, 1};
     protected static final int[] INITIAL_KEY2 = {0, 1, 1, 0, 1, 1, 0, 1};
     protected static final int[] INITIAL_KEY3 = {0, 1, 1, 0, 1, 1, 0, 1};
     protected static final int[] INITIAL_KEY4 = {0, 1, 1, 0, 1, 1, 0, 1};
@@ -30,7 +33,7 @@ public abstract class EncryptionAlgorithm {
     protected static final int[] INITIAL_KEY10 = {0, 1, 1, 0, 1, 1, 0, 1};
 
     //keys are modified as we progress through the encryption
-    protected static int[] key1 = INITIAL_KEY1;
+    protected static int[] key1 = ALTER_KEY ? INITIAL_KEY1_ALTERED : INITIAL_KEY1;
     protected static int[] key2 = INITIAL_KEY2;
     protected static int[] key3 = INITIAL_KEY3;
     protected static int[] key4 = INITIAL_KEY4;
@@ -358,8 +361,8 @@ public abstract class EncryptionAlgorithm {
         return pValues;
     }
 
-    private void resetKeys() {
-        key1 = INITIAL_KEY1;
+    public void resetKeys() {
+        key1 = ALTER_KEY ? INITIAL_KEY1_ALTERED : INITIAL_KEY1;
         key2 = INITIAL_KEY2;
         key3 = INITIAL_KEY3;
         key4 = INITIAL_KEY4;
